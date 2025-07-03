@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using itsc_dotnet_practice.Models;
-using itsc_dotnet_practice.Services;
+using itsc_dotnet_practice.Services.Interface;
 
 namespace itsc_dotnet_practice.Controllers;
 
@@ -8,21 +8,21 @@ namespace itsc_dotnet_practice.Controllers;
 [Route("api/[controller]")]
 public class ProductController : ControllerBase
 {
-    private readonly ProductService _service;
+    private readonly IProductService _service;
 
-    public ProductController(ProductService service)
+    public ProductController(IProductService service)
     {
         _service = service;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll() =>
-        Ok(await _service.GetAllAsync());
+        Ok(await _service.GetAllProductsAsync());
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var product = await _service.GetByIdAsync(id);
+        var product = await _service.GetProductByIdAsync(id);
         if (product == null) return NotFound();
         return Ok(product);
     }
@@ -30,7 +30,7 @@ public class ProductController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(Product product)
     {
-        await _service.AddAsync(product);
+        await _service.CreateProductAsync(product);
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
 
@@ -39,8 +39,8 @@ public class ProductController : ControllerBase
     {
         if (id != product.Id) return BadRequest();
 
-        var result = await _service.UpdateAsync(product);
-        if (!result) return NotFound();
+        var result = await _service.UpdateProductAsync(product);
+        if (result == null) return NotFound();
 
         return NoContent();
     }
@@ -48,7 +48,7 @@ public class ProductController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _service.DeleteAsync(id);
+        var result = await _service.DeleteProductAsync(id);
         if (!result) return NotFound();
 
         return NoContent();

@@ -1,20 +1,31 @@
 using itsc_dotnet_practice.Models;
-using itsc_dotnet_practice.Repositories;
+using itsc_dotnet_practice.Repositories.Interface;
+using itsc_dotnet_practice.Services.Interface;
 
-namespace itsc_dotnet_practice.Services;
-
-public class ProductService
+namespace itsc_dotnet_practice.Services
 {
-    private readonly ProductRepository _repo;
-
-    public ProductService(ProductRepository repo)
+    public class ProductService : IProductService
     {
-        _repo = repo;
-    }
+        private readonly IProductRepository _repository;
 
-    public Task<List<Product>> GetAllAsync() => _repo.GetAllAsync();
-    public Task<Product?> GetByIdAsync(int id) => _repo.GetByIdAsync(id);
-    public Task AddAsync(Product product) => _repo.AddAsync(product);
-    public Task<bool> DeleteAsync(int id) => _repo.DeleteAsync(id);
-    public Task<bool> UpdateAsync(Product product) => _repo.UpdateAsync(product);
+        public ProductService(IProductRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<Product>> GetAllProductsAsync() =>
+            await _repository.GetAllAsync();
+
+        public async Task<Product?> GetProductByIdAsync(int id) =>
+            await _repository.GetByIdAsync(id);
+
+        public async Task CreateProductAsync(Product product) =>
+            await _repository.AddAsync(product);
+
+        public async Task<Product?> UpdateProductAsync(Product product) =>
+            await _repository.UpdateAsync(product);
+
+        public async Task<bool> DeleteProductAsync(int id) =>
+            await _repository.DeleteAsync(id);
+    }
 }
