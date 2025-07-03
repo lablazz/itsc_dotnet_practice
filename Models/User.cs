@@ -6,6 +6,8 @@ namespace itsc_dotnet_practice.Models;
 [Table("Users")]
 public class User
 {
+    private readonly string confirmPassword;
+
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -20,7 +22,10 @@ public class User
     [Required]
     public string LastName { get; set; } = "";
 
-    public string? PhoneEncrypted { get; set; }
+    [Required]
+    public string Password { get; internal set; } = "";
 
-    public string? PasswordHash { get; set; }
+    public string Phone { get; internal set; } = "";
+
+    internal string ConfirmPassword => confirmPassword;
 }

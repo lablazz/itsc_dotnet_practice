@@ -1,6 +1,7 @@
 ﻿using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services.Interface;
+using itsc_dotnet_practice.Helpers;
 
 namespace itsc_dotnet_practice.Services;
 
@@ -25,6 +26,13 @@ public class UserService : IUserService
 
     public async Task<User> CreateUserAsync(User user)
     {
+        if (user.Password == user.ConfirmPassword)
+        {
+
+        }
+        user.Password = EncryptionHelper.HashPassword(user.Password);
+        user.Phone = EncryptionHelper.EncryptString(user.Phone);
+
         return await _userRepository.CreateAsync(user);
     }
 
