@@ -1,0 +1,32 @@
+﻿# deploy docker-compose.yml with postgres services and a volume for data persistence
+# and add dockerfile as api service
+
+version: '3.8'
+services:
+     postgres:
+        image: postgres:latest
+        container_name: postgres_container
+        environment:
+            POSTGRES_USER: user_example
+            POSTGRES_PASSWORD: example_password
+            POSTGRES_DB: example_db
+        ports:
+        - "5432:5432"
+        volumes:
+        - postgres_data:/var/lib/postgresql/data
+
+     api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: api_container
+        ports:
+        - "8000:8000"
+        depends_on:
+        - postgres
+        environment:
+            DATABASE_URL: postgres://user_example:example_password@postgres/example_db
+        restart: always
+
+volumes:
+    postgres_data:
