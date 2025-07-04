@@ -1,12 +1,16 @@
-﻿using itsc_dotnet_practice.Models;
-
-namespace itsc_dotnet_practice.Services.Interface;
+﻿// Services/UserService/Interface/IUserService.cs
+using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.UserDto;
 
 public interface IUserService
 {
     Task<IEnumerable<User>> GetAllUsersAsync();
+
     Task<User?> GetUserByIdAsync(int id);
-    Task<User> CreateUserAsync(User user);
-    Task<bool> UpdateUserAsync(int id, User user);
+
+    Task<CreateUserDtoResponse> CreateUserAsync(CreateUserDtoRequest dto);
+
+    Task<bool> UpdateUserAsync(int id, UserUpdateDtoRequest user);
+
     Task<bool> DeleteUserAsync(int id);
 }

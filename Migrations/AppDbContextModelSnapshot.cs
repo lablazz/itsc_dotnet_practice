@@ -61,10 +61,12 @@ namespace itsc_dotnet_practice.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneEncrypted")
+                    b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");

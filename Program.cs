@@ -4,16 +4,25 @@ using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services;
 using itsc_dotnet_practice.Services.Interface;
 using Microsoft.EntityFrameworkCore;
-using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load .env in development/local environment
+// Load .env so environment variables like AES_KEY and AES_IV are set
 DotNetEnv.Env.Load();
 
-// Prefer configuration from environment variables or appsettings, fallback to .env variables
-string GetEnvOrDefault(string key, string defaultValue) =>
-    Environment.GetEnvironmentVariable(key) ?? builder.Configuration[key] ?? defaultValue;
+// Database connection settings from env/config
+string GetEnvOrDefault(string key, string defaultValue)
+{
+    var envValue = Environment.GetEnvironmentVariable(key);
+    if (!string.IsNullOrEmpty(envValue))
+        return envValue;
+
+    var configValue = builder.Configuration[key];
+    if (!string.IsNullOrEmpty(configValue))
+        return configValue;
+
+    return defaultValue;
+}
 
 var dbHost = GetEnvOrDefault("DB_HOST", "localhost");
 var dbPort = GetEnvOrDefault("DB_PORT", "5432");
@@ -31,7 +40,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Dependency injection
+// Dependency injection for repositories and services
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -51,4 +60,5 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();
+
 app.Run();

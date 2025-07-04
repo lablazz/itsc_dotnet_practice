@@ -11,8 +11,8 @@ using itsc_dotnet_practice.Data;
 namespace itsc_dotnet_practice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250703091313_CreateUsersTable")]
-    partial class CreateUsersTable
+    [Migration("20250704040725_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,10 +64,12 @@ namespace itsc_dotnet_practice.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneEncrypted")
+                    b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");

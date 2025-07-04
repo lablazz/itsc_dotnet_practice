@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Services.Interface;
+using Microsoft.AspNetCore.Mvc;
 
 namespace itsc_dotnet_practice.Controllers;
 

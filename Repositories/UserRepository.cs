@@ -1,5 +1,6 @@
 ﻿using itsc_dotnet_practice.Data;
 using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.UserDto;
 using itsc_dotnet_practice.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +32,7 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<bool> UpdateAsync(User user)
+    public async Task<bool> UpdateAsync(UserUpdateDtoRequest user)
     {
         _context.Entry(user).State = EntityState.Modified;
 
@@ -42,7 +43,7 @@ public class UserRepository : IUserRepository
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!_context.Users.Any(e => e.Id == user.Id))
+            if (!await _context.Users.AnyAsync(e => e.Id == user.Id))
                 return false;
             throw;
         }
@@ -56,5 +57,11 @@ public class UserRepository : IUserRepository
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<bool> GetByEmailAsync(string email)
+    {
+        var emails = await _context.Users.FindAsync(email);
+        return emails != null;
     }
 }

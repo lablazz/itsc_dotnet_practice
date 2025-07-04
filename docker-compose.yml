@@ -31,6 +31,8 @@ services:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       ConnectionStrings__DefaultConnection: Host=postgres;Port=${POSTGRES_PORT};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB}
+      AES_KEY: ${AES_KEY}
+      AES_IV: ${AES_IV}
     restart: always
 
 volumes:

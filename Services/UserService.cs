@@ -1,7 +1,8 @@
 ﻿using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.UserDto;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services.Interface;
-using itsc_dotnet_practice.Helpers;
+using itsc_dotnet_practice.Utilities;
 
 namespace itsc_dotnet_practice.Services;
 
@@ -24,19 +25,37 @@ public class UserService : IUserService
         return await _userRepository.GetByIdAsync(id);
     }
 
-    public async Task<User> CreateUserAsync(User user)
+    public async Task<CreateUserDtoResponse> CreateUserAsync(CreateUserDtoRequest dto)
     {
-        if (user.Password == user.ConfirmPassword)
+        if (dto.Password != dto.ConfirmPassword)
+            throw new ArgumentException("Passwords do not match.");
+
+        bool emailExists = await _userRepository.GetByEmailAsync(dto.Email);
+        if (emailExists)
+            throw new ArgumentException("A user with this email already exists.");
+
+        var user = new User
         {
+            Email = dto.Email,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Password = EncryptionUtility.EncryptString(dto.Password),
+            Phone = EncryptionUtility.EncryptString(dto.Phone)
+        };
 
-        }
-        user.Password = EncryptionHelper.HashPassword(user.Password);
-        user.Phone = EncryptionHelper.EncryptString(user.Phone);
+        var createdUser = await _userRepository.CreateAsync(user);
 
-        return await _userRepository.CreateAsync(user);
+        return new CreateUserDtoResponse
+        {
+            Id = createdUser.Id,
+            Email = createdUser.Email,
+            FirstName = createdUser.FirstName,
+            LastName = createdUser.LastName,
+            Phone = EncryptionUtility.DecryptString(createdUser.Phone)
+        };
     }
 
-    public async Task<bool> UpdateUserAsync(int id, User user)
+    public async Task<bool> UpdateUserAsync(int id, UserUpdateDtoRequest user)
     {
         if (id != user.Id) return false;
         return await _userRepository.UpdateAsync(user);
@@ -46,4 +65,5 @@ public class UserService : IUserService
     {
         return await _userRepository.DeleteAsync(id);
     }
+
 }

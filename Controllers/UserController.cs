@@ -1,4 +1,6 @@
-﻿using itsc_dotnet_practice.Models;
+﻿using Humanizer;
+using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.UserDto;
 using itsc_dotnet_practice.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,18 +33,32 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> CreateUser(User user)
+    public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserDtoRequest dto)
     {
-        var createdUser = await _userService.CreateUserAsync(user);
+        var createdUser = await _userService.CreateUserAsync(dto);
         return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(int id, User user)
+    public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDtoRequest user)
     {
-        var updated = await _userService.UpdateUserAsync(id, user);
-        if (!updated) return NotFound();
-        return NoContent();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var updated = await _userService.UpdateUserAsync(id, user);
+            if (!updated)
+                return NotFound();
+
+            return NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id}")]
