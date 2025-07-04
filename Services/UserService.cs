@@ -3,6 +3,7 @@ using itsc_dotnet_practice.Models.ModelDtos.UserDto;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services.Interface;
 using itsc_dotnet_practice.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace itsc_dotnet_practice.Services;
 
@@ -15,15 +16,26 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    public async Task<IEnumerable<CreateUserDtoResponse>> GetAllUsersAsync()
     {
-        return await _userRepository.GetAllAsync();
+        return (IEnumerable<CreateUserDtoResponse>)await _userRepository.GetAllAsync();
     }
 
-    public async Task<User?> GetUserByIdAsync(int id)
+    public async Task<CreateUserDtoResponse?> GetByIdAsync(int id)
     {
-        return await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null) return null;
+
+        return new CreateUserDtoResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = EncryptionUtility.DecryptString(user.Phone)
+        };
     }
+
 
     public async Task<CreateUserDtoResponse> CreateUserAsync(CreateUserDtoRequest dto)
     {
@@ -57,7 +69,14 @@ public class UserService : IUserService
 
     public async Task<bool> UpdateUserAsync(int id, UserUpdateDtoRequest user)
     {
-        if (id != user.Id) return false;
+        var existingUser = await _userRepository.GetByIdAsync(id);
+        if (existingUser == null) return false;
+        if (!EncryptionUtility.CompareEncryptedString(existingUser.Password, user.Password))
+        {
+            throw new ArgumentException("Invalid Email or Password, Please try again");
+        }
+
+        user.Id = id;
         return await _userRepository.UpdateAsync(user);
     }
 

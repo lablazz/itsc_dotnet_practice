@@ -35,18 +35,20 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserDtoRequest dto)
     {
-        var createdUser = await _userService.CreateUserAsync(dto);
-        return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
+        try
+        {
+            var createdUser = await _userService.CreateUserAsync(dto);
+            return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDtoRequest user)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
         try
         {
             var updated = await _userService.UpdateUserAsync(id, user);

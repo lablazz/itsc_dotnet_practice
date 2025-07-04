@@ -5,11 +5,11 @@ namespace itsc_dotnet_practice.Repositories.Interface;
 
 public interface IUserRepository
 {
-    Task<IEnumerable<User>> GetAllAsync();
+    Task<IEnumerable<CreateUserDtoResponse>> GetAllAsync();
 
     Task<User?> GetByIdAsync(int id);
 
-    Task<User> CreateAsync(User user);
+    Task<CreateUserDtoResponse> CreateAsync(User user);
 
     Task<bool> UpdateAsync(UserUpdateDtoRequest user);
 

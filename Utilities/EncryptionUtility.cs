@@ -62,5 +62,18 @@ namespace itsc_dotnet_practice.Utilities
 
             return sr.ReadToEnd();
         }
+
+        public static bool CompareEncryptedString(string encryptedText, string plainText)
+        {
+            try
+            {
+                string decryptedText = DecryptString(encryptedText);
+                return decryptedText == plainText;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
