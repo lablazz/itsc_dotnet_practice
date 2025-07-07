@@ -27,6 +27,7 @@ namespace itsc_dotnet_practice.Models.ModelDtos.UserDto
 
     public class UserUpdateDtoRequest
     {
+        [Required]
         public int Id { get; set; }
         public string Email { get; set; } = "";
         public string FirstName { get; set; } = "";

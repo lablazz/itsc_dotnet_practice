@@ -9,21 +9,32 @@ namespace itsc_dotnet_practice.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserRepository _repository;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository repository)
     {
-        _userRepository = userRepository;
+        _repository = repository;
     }
 
     public async Task<IEnumerable<CreateUserDtoResponse>> GetAllUsersAsync()
     {
-        return (IEnumerable<CreateUserDtoResponse>)await _userRepository.GetAllAsync();
+        var users = await _repository.GetAllAsync();
+
+        return users.Select(user => new CreateUserDtoResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = EncryptionUtility.IsBase64(user.Phone)
+                ? EncryptionUtility.DecryptString(user.Phone)
+                : user.Phone // fallback if not encrypted
+        }).OrderBy(u => u.Id);
     }
 
-    public async Task<CreateUserDtoResponse?> GetByIdAsync(int id)
+    public async Task<CreateUserDtoResponse?> GetUserByIdAsync(int id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _repository.GetByIdAsync(id);
         if (user == null) return null;
 
         return new CreateUserDtoResponse
@@ -36,27 +47,31 @@ public class UserService : IUserService
         };
     }
 
-
     public async Task<CreateUserDtoResponse> CreateUserAsync(CreateUserDtoRequest dto)
     {
+        // Validate passwords match
         if (dto.Password != dto.ConfirmPassword)
             throw new ArgumentException("Passwords do not match.");
 
-        bool emailExists = await _userRepository.GetByEmailAsync(dto.Email);
+        // Check for existing email
+        bool emailExists = await _repository.GetByEmailAsync(dto.Email);
         if (emailExists)
             throw new ArgumentException("A user with this email already exists.");
 
+        // Create User entity with encrypted values
         var user = new User
         {
             Email = dto.Email,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
-            Password = EncryptionUtility.EncryptString(dto.Password),
-            Phone = EncryptionUtility.EncryptString(dto.Phone)
+            Password = EncryptionUtility.HashPassword(dto.Password), // Use hash for passwords
+            Phone = EncryptionUtility.EncryptString(dto.Phone)       // Symmetric for phone
         };
 
-        var createdUser = await _userRepository.CreateAsync(user);
+        // Save to repository
+        var createdUser = await _repository.CreateAsync(user);
 
+        // Return response DTO with decrypted phone
         return new CreateUserDtoResponse
         {
             Id = createdUser.Id,
@@ -67,22 +82,28 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<bool> UpdateUserAsync(int id, UserUpdateDtoRequest user)
+    public async Task<bool> UpdateUserAsync(int id, UserUpdateDtoRequest userDto)
     {
-        var existingUser = await _userRepository.GetByIdAsync(id);
+        var existingUser = await _repository.GetByIdAsync(id);
         if (existingUser == null) return false;
-        if (!EncryptionUtility.CompareEncryptedString(existingUser.Password, user.Password))
+
+        if (!EncryptionUtility.CompareEncryptedString(existingUser.Password, userDto.Password))
         {
             throw new ArgumentException("Invalid Email or Password, Please try again");
         }
 
-        user.Id = id;
-        return await _userRepository.UpdateAsync(user);
+        // ✅ Manual field-by-field mapping from DTO to entity
+        existingUser.Email = userDto.Email;
+        existingUser.FirstName = userDto.FirstName;
+        existingUser.LastName = userDto.LastName;
+        existingUser.Phone = EncryptionUtility.EncryptString(userDto.Phone);
+        existingUser.Password = EncryptionUtility.HashPassword(userDto.Password);
+
+        return await _repository.UpdateAsync(existingUser);
     }
 
     public async Task<bool> DeleteUserAsync(int id)
     {
-        return await _userRepository.DeleteAsync(id);
+        return await _repository.DeleteAsync(id);
     }
-
 }

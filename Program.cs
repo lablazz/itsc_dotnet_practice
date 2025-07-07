@@ -1,16 +1,16 @@
 ﻿using itsc_dotnet_practice.Data;
-using itsc_dotnet_practice.Repositories;
-using itsc_dotnet_practice.Repositories.Interface;
-using itsc_dotnet_practice.Services;
-using itsc_dotnet_practice.Services.Interface;
+using itsc_dotnet_practice.Seeds;  // For DatabaseSeeder
+using itsc_dotnet_practice.Services; // For UserService
+using itsc_dotnet_practice.Utilities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Load .env so environment variables like AES_KEY and AES_IV are set
 DotNetEnv.Env.Load();
 
-// Database connection settings from env/config
+// Helper to load from ENV or fallback to appsettings
 string GetEnvOrDefault(string key, string defaultValue)
 {
     var envValue = Environment.GetEnvironmentVariable(key);
@@ -24,6 +24,7 @@ string GetEnvOrDefault(string key, string defaultValue)
     return defaultValue;
 }
 
+// DB Connection values
 var dbHost = GetEnvOrDefault("DB_HOST", "localhost");
 var dbPort = GetEnvOrDefault("DB_PORT", "5432");
 var dbName = GetEnvOrDefault("DB_NAME", "itsc_db");
@@ -32,33 +33,38 @@ var dbPassword = GetEnvOrDefault("DB_PASSWORD", "supersecurepassword");
 
 var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
 
+// Register DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Add services to the container
+// Register MVC + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Dependency injection for repositories and services
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
+// ⛓ Register services and repositories by convention
+builder.Services.AddScopedServicesByConvention(Assembly.GetExecutingAssembly());
+
+// Make sure UserService is registered (if not registered by convention, register here explicitly)
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
-// Apply migrations at startup
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+
+    await dbContext.Database.MigrateAsync();
+
+    // Await seed async and pass UserService
+    await DatabaseSeeder.SeedAsync(dbContext, userService);
 }
 
-// Enable Swagger middleware
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

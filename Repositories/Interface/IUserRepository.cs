@@ -9,9 +9,9 @@ public interface IUserRepository
 
     Task<User?> GetByIdAsync(int id);
 
-    Task<CreateUserDtoResponse> CreateAsync(User user);
+    Task<User> CreateAsync(User user);
 
-    Task<bool> UpdateAsync(UserUpdateDtoRequest user);
+    Task<bool> UpdateAsync(User user);
 
     Task<bool> DeleteAsync(int id);
 

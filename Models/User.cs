@@ -24,4 +24,7 @@ public class User
     public string Password { get; internal set; } = "";
 
     public string Phone { get; internal set; } = "";
+
+    public List<Order> Orders { get; set; } = new();
+
 }

@@ -17,7 +17,16 @@ public class UserRepository : IUserRepository
 
     public async Task<IEnumerable<CreateUserDtoResponse>> GetAllAsync()
     {
-        return (IEnumerable<CreateUserDtoResponse>)await _context.Users.ToListAsync();
+        var users = await _context.Users.ToListAsync();
+
+        return users.Select(user => new CreateUserDtoResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = user.Phone
+        });
     }
 
     public async Task<User?> GetByIdAsync(int id)
@@ -32,9 +41,9 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<bool> UpdateAsync(UserUpdateDtoRequest user)
+    public async Task<bool> UpdateAsync(User user)
     {
-        _context.Entry(user).State = EntityState.Modified;
+        _context.Users.Update(user);
 
         try
         {

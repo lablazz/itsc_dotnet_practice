@@ -1,4 +1,6 @@
 using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.ProductDto;
+using itsc_dotnet_practice.Services;
 using itsc_dotnet_practice.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,18 +30,31 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Product product)
+    public async Task<IActionResult> CreateProduct([FromBody] ProductModelRequest request)
     {
-        await _service.CreateProductAsync(product);
-        return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+        try
+        {
+            var product = await _service.CreateProductAsync(request);
+            return Ok(product);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", detail = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Product product)
+    public async Task<IActionResult> Update(int id, ProductModelRequest product)
     {
-        if (id != product.Id) return BadRequest();
-
-        var result = await _service.UpdateProductAsync(product);
+        var result = await _service.UpdateProductAsync(id, product);
         if (result == null) return NotFound();
 
         return NoContent();

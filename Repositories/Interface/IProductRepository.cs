@@ -1,4 +1,5 @@
 ﻿using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.ProductDto;
 
 namespace itsc_dotnet_practice.Repositories.Interface
 {
@@ -13,5 +14,6 @@ namespace itsc_dotnet_practice.Repositories.Interface
         Task<Product?> UpdateAsync(Product product);
 
         Task<bool> DeleteAsync(int id);
+        Task<Product?> GetByNameAsync(string name);
     }
 }

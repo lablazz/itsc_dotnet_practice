@@ -1,4 +1,5 @@
 ﻿using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.ProductDto;
 
 namespace itsc_dotnet_practice.Services.Interface
 {
@@ -8,9 +9,9 @@ namespace itsc_dotnet_practice.Services.Interface
 
         Task<Product?> GetProductByIdAsync(int id);
 
-        Task CreateProductAsync(Product product);
+        Task<Product> CreateProductAsync(ProductModelRequest request);
 
-        Task<Product?> UpdateProductAsync(Product product);
+        Task<Product?> UpdateProductAsync(int id, ProductModelRequest product);
 
         Task<bool> DeleteProductAsync(int id);
     }

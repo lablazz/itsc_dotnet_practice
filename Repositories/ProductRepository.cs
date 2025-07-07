@@ -1,5 +1,6 @@
 using itsc_dotnet_practice.Data;
 using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Models.ModelDtos.ProductDto;
 using itsc_dotnet_practice.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,7 @@ namespace itsc_dotnet_practice.Repositories
             await _context.SaveChangesAsync();
         }
 
+
         public async Task<Product?> UpdateAsync(Product product)
         {
             var existing = await _context.Products.FindAsync(product.Id);
@@ -47,5 +49,12 @@ namespace itsc_dotnet_practice.Repositories
 
             return true;
         }
+
+        public async Task<Product?> GetByNameAsync(string name)
+        {
+            return await _context.Products
+                                 .FirstOrDefaultAsync(p => p.Name == name);
+        }
+
     }
 }
