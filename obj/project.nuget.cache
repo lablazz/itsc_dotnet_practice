@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "2fzFsBLofZc=",
+  "success": true,
+  "projectFilePath": "C:\\Work\\itsc_dotnet_practice\\itsc_dotnet_practice.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\narav\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.6\\microsoft.aspnetcore.openapi.9.0.6.nupkg.sha512",
+    "C:\\Users\\narav\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
