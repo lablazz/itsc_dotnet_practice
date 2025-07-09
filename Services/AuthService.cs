@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿using DotNetEnv;
 using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Models.Dtos;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services.Interface;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using itsc_dotnet_practice.Utilities;
 
 namespace itsc_dotnet_practice.Services;
 
@@ -29,7 +29,7 @@ public class AuthService : IAuthService
         return await _userRepo.GetUserAsync(login.Username, login.Password);
     }
 
-    public async Task<User?> ValidateBasicAuthAsync(string authHeader)
+    public User? ValidateBasicAuth(string authHeader)
     {
         if (string.IsNullOrWhiteSpace(authHeader)) return null;
 
@@ -38,7 +38,20 @@ public class AuthService : IAuthService
         var parts = decoded.Split(':');
         if (parts.Length != 2) return null;
 
-        return await _userRepo.GetUserAsync(parts[0], parts[1]);
+        //return await _userRepo.GetValidationBasicAuth(parts[0], parts[1]);
+        if (Env.GetString("ADMIN_USERNAME") == null || Env.GetString("ADMIN_PASSWORD") == null)
+        {
+            throw new System.Exception("ADMIN_USERNAME or ADMIN_PASSWORD is not set.");
+        }
+        if (Env.GetString("ADMIN_USERNAME") != parts[0] || Env.GetString("ADMIN_PASSWORD") != parts[1])
+        {
+            return null;
+        }
+        return new User
+        {
+            Username = parts[0],
+            Role = "Admin"
+        };
     }
 
     public string GenerateJwtToken(User user)

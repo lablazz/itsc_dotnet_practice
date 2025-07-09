@@ -11,7 +11,7 @@ using itsc_dotnet_practice.Data;
 namespace itsc_dotnet_practice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250709041446_InitialCreate")]
+    [Migration("20250709050947_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

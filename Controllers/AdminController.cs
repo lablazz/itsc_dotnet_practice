@@ -12,10 +12,10 @@ public class AdminController : ControllerBase
     public AdminController(IAuthService authService) => _authService = authService;
 
     [HttpGet("dashboard")]
-    public async Task<IActionResult> Dashboard()
+    public IActionResult Dashboard()
     {
         var authHeader = Request.Headers["Authorization"].ToString();
-        var user = await _authService.ValidateBasicAuthAsync(authHeader);
+        var user = _authService.ValidateBasicAuth(authHeader);
         if (user == null || user.Role != "Admin")
             return Unauthorized("Admin access only");
 

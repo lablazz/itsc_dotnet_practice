@@ -1,4 +1,5 @@
-﻿using itsc_dotnet_practice.Data;
+﻿using DotNetEnv;
+using itsc_dotnet_practice.Data;
 using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Utilities;
@@ -33,5 +34,4 @@ public class UserRepository : IUserRepository
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
     }
-
 }
