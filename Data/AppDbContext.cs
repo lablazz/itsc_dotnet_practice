@@ -1,11 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyProject.Models;
+using itsc_dotnet_practice.Models;
 
-namespace MyProject.Data;
-
-public class AppDbContext : DbContext
+namespace itsc_dotnet_practice.Data
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    public DbSet<User> Users => Set<User>();
+        public DbSet<User> Users => Set<User>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Explicitly map to lowercase PostgreSQL table name
+            modelBuilder.Entity<User>().ToTable("users");
+
+            modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
+        }
+    }
 }

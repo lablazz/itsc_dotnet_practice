@@ -1,41 +1,84 @@
+using DotNetEnv;
+using itsc_dotnet_practice.Data;
+using itsc_dotnet_practice.Repositories;
+using itsc_dotnet_practice.Repositories.Interface;
+using itsc_dotnet_practice.Services;
+using itsc_dotnet_practice.Services.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Load .env variables
+Env.Load();
+
+// Read DB & JWT values
+var dbHost = Env.GetString("DB_HOST");
+var dbPort = Env.GetString("DB_PORT");
+var dbName = Env.GetString("DB_NAME");
+var dbUser = Env.GetString("DB_USER");
+var dbPass = Env.GetString("DB_PASSWORD");
+
+var jwtKey = Env.GetString("JWT_KEY");
+var jwtIssuer = Env.GetString("JWT_ISSUER");
+var jwtAudience = Env.GetString("JWT_AUDIENCE");
+
+var connBuilder = new Npgsql.NpgsqlConnectionStringBuilder()
+{
+    Host = dbHost,
+    Port = int.Parse(dbPort),
+    Database = dbName,
+    Username = dbUser,
+    Password = dbPass
+};
+
+string connectionString = connBuilder.ConnectionString;
+
+Console.WriteLine($"Using DB host: {dbHost}");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// DI
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// JWT Auth
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -1,16 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// User.cs
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyProject.Models;
+namespace itsc_dotnet_practice.Models;
 
 public class User
 {
     public int Id { get; set; }
-
-    [Required]
-    public string Username { get; set; } = "";
-
-    [Required]
-    public string Password { get; set; } = "";
-
+    [Required] public string Username { get; set; } = "";
+    [Required] public string FullName { get; set; } = "";
+    [Required] public string Password { get; set; } = "";
+    [Required] public string Phone { get; set; } = "";
     public string Role { get; set; } = "User";
 }
