@@ -11,8 +11,8 @@ using itsc_dotnet_practice.Data;
 namespace itsc_dotnet_practice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250708185513_FixUsersTableName")]
-    partial class FixUsersTableName
+    [Migration("20250709041446_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,10 +54,7 @@ namespace itsc_dotnet_practice.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Username")
-                        .IsUnique();
-
-                    b.ToTable("users");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

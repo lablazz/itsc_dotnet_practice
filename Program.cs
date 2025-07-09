@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 
 // Read DB & JWT values
-var dbHost = Env.GetString("DB_HOST");
+var dbHost = Env.GetString("DB_HOST") ?? "localhost";
 var dbPort = Env.GetString("DB_PORT");
 var dbName = Env.GetString("DB_NAME");
 var dbUser = Env.GetString("DB_USER");
@@ -45,7 +45,7 @@ Console.WriteLine($"Using DB host: {dbHost}");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// DI
+// DI 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
