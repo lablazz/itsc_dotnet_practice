@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace itsc_dotnet_practice.Models
@@ -10,10 +11,11 @@ namespace itsc_dotnet_practice.Models
         [Required] public string Description { get; set; } = "";
         [Required] public decimal Price { get; set; }
         [Required] public int Stock { get; set; }
-        public string ImageUrl { get; set; } = "";
         public string Category { get; set; } = "";
-        
-        // Navigation property for related orders
-        //public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public string ImageUrl { get; set; } = "";
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }
