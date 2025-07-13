@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using itsc_dotnet_practice.Models;
+﻿using itsc_dotnet_practice.Models;
+using itsc_dotnet_practice.Seeds;
+using Microsoft.EntityFrameworkCore;
 
 namespace itsc_dotnet_practice.Data
 {
@@ -8,9 +9,12 @@ namespace itsc_dotnet_practice.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Product> Products { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            ProductSeed.Seed(modelBuilder);
         }
 
     }
