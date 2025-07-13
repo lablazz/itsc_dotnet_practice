@@ -1,5 +1,7 @@
-using DotNetEnv;
+﻿using DotNetEnv;
 using itsc_dotnet_practice.Data;
+using itsc_dotnet_practice.Document;
+using itsc_dotnet_practice.Document.Interface;
 using itsc_dotnet_practice.Repositories;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services;
@@ -46,11 +48,11 @@ Console.WriteLine($"Using DB host: {dbHost}");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// JWT Auth
+builder.Services.AddSingleton<IDocument, Document>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -71,13 +73,38 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+using (var serviceProvider = builder.Services.BuildServiceProvider())
+{
+    var documentService = serviceProvider.GetRequiredService<IDocument>();
+    var openApiDoc = documentService.GetOpenApiDocument();
+
+    builder.Services.Configure<Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions>(options =>
+    {
+        options.SwaggerDoc("v1", openApiDoc.Info);
+
+        foreach (var kv in openApiDoc.Components.SecuritySchemes)
+        {
+            options.AddSecurityDefinition(kv.Key, kv.Value);
+        }
+
+        foreach (var requirement in openApiDoc.SecurityRequirements)
+        {
+            options.AddSecurityRequirement(requirement);
+        }
+    });
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ITSC .NET Practice API v1");
+    });
 }
+
 using (var scope = app.Services.CreateScope())
 
 {
@@ -85,13 +112,6 @@ using (var scope = app.Services.CreateScope())
 
     db.Database.Migrate();
 }
-
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//    db.Database.Migrate(); // apply any pending migrations
-//    DbSeeder.SeedAdminUser(db);
-//}
 
 app.UseAuthentication();
 app.UseAuthorization();
