@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Controllers;
 
-[Route("api/[controller]") ]
+[Route("api/[Controller]") ]
 [ApiController]
 [Authorize]
 [Produces("application/json")]
@@ -21,14 +21,14 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
-    [HttpGet("products")]
+    [HttpGet()]
     public async Task<IActionResult> GetAllProducts()
     {
         var products = await _productService.GetAllProductsAsync();
         return Ok(products);
     }
 
-    [HttpGet("products/{id}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id)
     {
         var product = await _productService.GetProductByIdAsync(id);
@@ -36,14 +36,14 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
-    [HttpPost("products")]
+    [HttpPost()]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateProduct([FromBody] ProductDto.Request productDto)
     {
         var createdProduct = await _productService.CreateProductAsync(productDto);
         return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
     }
-    [HttpPut("products/{id}")]
+    [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product productDto)
     {
@@ -51,7 +51,7 @@ public class ProductController : ControllerBase
         if (updatedProduct == null) return NotFound("Product not found");
         return Ok(updatedProduct);
     }
-    [HttpDelete("products/{id}")]
+    [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
