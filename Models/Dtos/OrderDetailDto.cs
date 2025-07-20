@@ -2,7 +2,7 @@
 
 public class OrderDetailDto
 {
-    public class Request
+    public class OrderDetailRequest
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }

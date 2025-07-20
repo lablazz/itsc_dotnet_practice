@@ -37,7 +37,7 @@ public class ProductRepository : IProductRepository
             ImageUrl = product.ImageUrl
         };
         _context.Products.Add(newProduct);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return newProduct;
     }
     public async Task<Product> UpdateProductAsync(int id, Product product)
@@ -48,7 +48,7 @@ public class ProductRepository : IProductRepository
         existingProduct.Price = product.Price;
         existingProduct.Description = product.Description;
         _context.Products.Update(existingProduct);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return existingProduct;
     }
     public async Task<bool> DeleteProductAsync(int id)
@@ -56,7 +56,7 @@ public class ProductRepository : IProductRepository
         var product = await _context.Products.FindAsync(id);
         if (product == null) return false;
         _context.Products.Remove(product);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return true;
     }
 }

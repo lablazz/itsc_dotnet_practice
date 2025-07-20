@@ -12,13 +12,12 @@ namespace itsc_dotnet_practice.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Log> Logs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            ProductSeed.Seed(modelBuilder);
         }
-
     }
 }

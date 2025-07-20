@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Services;
 
-public class OrderSevice : IOrderService
+public class OrderService : IOrderService
 {
     private readonly IOrderRepository _repo;
-    public OrderSevice(IOrderRepository repo)
+    public OrderService(IOrderRepository repo)
     {
         _repo = repo;
     }
@@ -23,14 +23,6 @@ public class OrderSevice : IOrderService
     public async Task<List<Order>> GetOrdersByStatusAsync(string status)
     {
         return await _repo.GetOrdersByStatusAsync(status);
-    }
-    public async Task<Order> CreateOrderAsync(OrderDto.Request request)
-    {
-        return await _repo.CreateOrderAsync(request);
-    }
-    public async Task<Order> UpdateOrderStatusAsync(int orderId, string newStatus)
-    {
-        return await _repo.UpdateOrderStatusAsync(orderId, newStatus);
     }
     public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
     {
@@ -44,5 +36,17 @@ public class OrderSevice : IOrderService
             return orders;
         }
         return orders.FindAll(o => o.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+    }
+    public async Task<Order> CreateOrderAsync(OrderDto.OrderRequest request)
+    {
+        return await _repo.CreateOrderAsync(request);
+    }
+    public async Task<Order> UpdateShippingAddressAsync(int orderId, string newShippingAddress)
+    {
+        return await _repo.UpdateShippingAddressAsync(orderId, newShippingAddress);
+    }
+    public async Task<Order> CancelOrderAsync(int orderId)
+    {
+        return await _repo.CancelOrderAsync(orderId);
     }
 }

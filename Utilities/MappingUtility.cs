@@ -10,7 +10,7 @@ namespace itsc_dotnet_practice.Utilities
 {
     public static class MapperUtility
     {
-        public static async Task<Order> MapToOrderAsync(OrderDto.Request request, DbContext dbContext)
+        public static async Task<Order> MapToOrderAsync(OrderDto.OrderRequest request, DbContext dbContext)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));

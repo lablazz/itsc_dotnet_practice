@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using itsc_dotnet_practice.Data;
@@ -11,9 +12,11 @@ using itsc_dotnet_practice.Data;
 namespace itsc_dotnet_practice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716071447_AddLog")]
+    partial class AddLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,33 +24,6 @@ namespace itsc_dotnet_practice.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("itsc_dotnet_practice.Models.Log", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Exception")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LogLevel")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Logs");
-                });
 
             modelBuilder.Entity("itsc_dotnet_practice.Models.Order", b =>
                 {
@@ -184,37 +160,37 @@ namespace itsc_dotnet_practice.Migrations
                         {
                             Id = 1,
                             Category = "Clothing",
-                            CreatedAt = new DateTime(2025, 7, 16, 7, 17, 34, 917, DateTimeKind.Utc).AddTicks(9181),
+                            CreatedAt = new DateTime(2025, 7, 16, 7, 14, 46, 560, DateTimeKind.Utc).AddTicks(3413),
                             Description = "Beautiful handmade Karen shirt with traditional patterns.",
                             ImageUrl = "https://example.com/images/karen-shirt.jpg",
                             Name = "Handwoven Karen Shirt",
                             Price = 49.99m,
                             Stock = 25,
-                            UpdatedAt = new DateTime(2025, 7, 16, 7, 17, 34, 917, DateTimeKind.Utc).AddTicks(9181)
+                            UpdatedAt = new DateTime(2025, 7, 16, 7, 14, 46, 560, DateTimeKind.Utc).AddTicks(3414)
                         },
                         new
                         {
                             Id = 2,
                             Category = "Accessories",
-                            CreatedAt = new DateTime(2025, 7, 16, 7, 17, 34, 917, DateTimeKind.Utc).AddTicks(9185),
+                            CreatedAt = new DateTime(2025, 7, 16, 7, 14, 46, 560, DateTimeKind.Utc).AddTicks(3418),
                             Description = "Natural cotton bag with traditional Karen embroidery.",
                             ImageUrl = "https://example.com/images/cotton-bag.jpg",
                             Name = "Embroidered Cotton Bag",
                             Price = 19.99m,
                             Stock = 40,
-                            UpdatedAt = new DateTime(2025, 7, 16, 7, 17, 34, 917, DateTimeKind.Utc).AddTicks(9185)
+                            UpdatedAt = new DateTime(2025, 7, 16, 7, 14, 46, 560, DateTimeKind.Utc).AddTicks(3419)
                         },
                         new
                         {
                             Id = 3,
                             Category = "Accessories",
-                            CreatedAt = new DateTime(2025, 7, 16, 7, 17, 34, 917, DateTimeKind.Utc).AddTicks(9188),
+                            CreatedAt = new DateTime(2025, 7, 16, 7, 14, 46, 560, DateTimeKind.Utc).AddTicks(3422),
                             Description = "Soft scarf with intricate hand embroidery, perfect for any season.",
                             ImageUrl = "https://example.com/images/scarf.jpg",
                             Name = "Handmade Scarf",
                             Price = 29.99m,
                             Stock = 30,
-                            UpdatedAt = new DateTime(2025, 7, 16, 7, 17, 34, 917, DateTimeKind.Utc).AddTicks(9189)
+                            UpdatedAt = new DateTime(2025, 7, 16, 7, 14, 46, 560, DateTimeKind.Utc).AddTicks(3422)
                         });
                 });
 
