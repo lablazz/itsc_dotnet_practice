@@ -24,17 +24,5 @@ namespace itsc_dotnet_practice.Models.Dtos
         public string ConfirmPassword { get; set; } = "";
 
         public string Role { get; set; } = "User";
-
-        public User ToUser()
-        {
-            return new User
-            {
-                Username = this.Username,
-                FullName = this.FullName,
-                Phone = this.Phone,
-                Password = EncryptionUtility.HashPassword(this.Password),
-                Role = this.Role
-            };
-        }
     }
 }
