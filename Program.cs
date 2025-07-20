@@ -1,7 +1,9 @@
 ﻿using DotNetEnv;
+using AutoMapper;
 using itsc_dotnet_practice.Data;
 using itsc_dotnet_practice.Document;
 using itsc_dotnet_practice.Document.Interface;
+using itsc_dotnet_practice.Models.Mapper;
 using itsc_dotnet_practice.Repositories;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Seeds;
@@ -47,6 +49,12 @@ Console.WriteLine($"Using DB host: {dbHost}");
 // Register DB context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Register AutoMapper with your UserProfile
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<UserProfile>();
+});
 
 // Register repositories and services
 builder.Services.AddScoped<IUserRepository, UserRepository>();

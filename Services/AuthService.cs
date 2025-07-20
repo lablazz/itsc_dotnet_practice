@@ -1,4 +1,6 @@
-﻿using DotNetEnv;
+﻿using AutoMapper;
+using DotNetEnv;
+using Humanizer;
 using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Models.Dtos;
 using itsc_dotnet_practice.Repositories.Interface;
@@ -75,17 +77,18 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<bool> RegisterAsync(RegisterRequestDto register)
+    public async Task<User> RegisterAsync(RegisterRequestDto register)
     {
+        if (register == null) throw new ArgumentNullException(nameof(register));
         var existingUser = await _userRepo.GetUserByUsernameAsync(register.Username);
-        if (existingUser != null) return false;
-
+        if (existingUser != null)
+        {
+            throw new Exception("Username already exists");
+        }
         if (register.Password != register.ConfirmPassword)
+        {
             throw new Exception("Passwords do not match");
-
-        var newUser = register.ToUser();
-
-        await _userRepo.CreateUserAsync(newUser);
-        return true;
+        }
+        return await _userRepo.CreateUserAsync(register);
     }
 }

@@ -9,6 +9,6 @@ public interface IAuthService
     Task<User?> AuthenticateAsync(LoginRequestDto login);
     User? ValidateBasicAuth(string authHeader);
     string GenerateJwtToken(User user);
-    Task<bool> RegisterAsync(RegisterRequestDto register);
+    Task<User> RegisterAsync(RegisterRequestDto register);
 
 }
