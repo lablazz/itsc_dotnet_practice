@@ -82,6 +82,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Register HttpClient for external API calls (e.g., Pokémon API)
+builder.Services.AddHttpClient();
+
 // Authorization & Controllers
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
@@ -125,9 +128,15 @@ app.UseSwaggerUI(options =>
 // Apply pending EF Core migrations on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+
+    // Seed users
     UserSeeder.Seed(db);
+
+    // Seed products from Pokémon API
+    await ProductSeeder.SeedAsync(services);
 }
 
 app.UseAuthentication();

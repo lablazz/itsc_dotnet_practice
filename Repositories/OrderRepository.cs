@@ -1,8 +1,8 @@
-﻿using itsc_dotnet_practice.Data;
+﻿using AutoMapper;
+using itsc_dotnet_practice.Data;
 using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Models.Dtos;
 using itsc_dotnet_practice.Repositories.Interface;
-using itsc_dotnet_practice.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,9 +14,12 @@ namespace itsc_dotnet_practice.Repositories;
 public class OrderRepository : IOrderRepository
 {
     private readonly AppDbContext _context;
-    public OrderRepository(AppDbContext context)
+    // automapper
+    private readonly IMapper _mapper;
+    public OrderRepository(AppDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
     // to get all ordrers
      public async Task<List<Order>> GetAllOrdersAsync()
@@ -64,7 +67,7 @@ public class OrderRepository : IOrderRepository
     }
     public async Task<Order> CreateOrderAsync(OrderDto.OrderRequest request)
     {
-        var order = await MapperUtility.MapToOrderAsync(request, _context);
+        var order = _mapper.Map<Order>(request);
         if (order == null)
         {
             throw new ArgumentNullException(nameof(order), "Order cannot be null.");
