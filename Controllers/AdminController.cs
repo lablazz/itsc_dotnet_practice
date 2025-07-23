@@ -22,4 +22,18 @@ public class AdminController : ControllerBase
 
         return Ok(new { token });
     }
+
+    //[HttpPost("approve-order")]
+    //public async Task<IActionResult> ApproveOrder([FromBody] Models.Dtos.OrderDto.OrderRequest orderRequest)
+    //{
+    //    var authHeader = Request.Headers["Authorization"].ToString();
+    //    var user = _authService.ValidateBasicAuth(authHeader);
+    //    if (user == null || user.Role != "Admin")
+    //        return Unauthorized("Admin access only");
+    //    var result = await _authService.ApproveOrder(orderRequest);
+    //    if (result.IsSuccess)
+    //        return Ok(result.Data);
+
+    //    return BadRequest(result.ErrorMessage);
+    //}
 }

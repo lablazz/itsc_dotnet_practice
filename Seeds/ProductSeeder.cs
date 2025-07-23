@@ -26,6 +26,8 @@ public static class ProductSeeder
         var random = new Random();
         var products = new List<Product>();
 
+        //var pokemonCount = await httpClient.GetAsync("https://pokeapi.co/api/v2/pokemon");
+
         for (int i = 1; i <= 10; i++)
         {
             try
