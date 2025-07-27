@@ -116,6 +116,14 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 // Enable Swagger UI (enable in all environments or restrict with IsDevelopment if you want)
@@ -143,5 +151,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseCors("AllowAll");
 
 app.Run();
