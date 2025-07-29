@@ -59,10 +59,29 @@ public class AuthService : IAuthService
 
     public string GenerateJwtToken(User user)
     {
-        var claims = new[] {
+        Claim[] claims;
+
+        if (user.Role.Equals("admin", StringComparison.OrdinalIgnoreCase))
+        {
+            claims = new[]
+            {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim("username", user.Username)
         };
+        }
+        else
+        {
+            claims = new[]
+            {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role),
+            new Claim("username", user.Username),
+            new Claim("fullName", user.FullName),
+            new Claim("role", user.Role),
+            new Claim("phone", user.Phone)
+        };
+        }
+
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT_KEY"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Controllers;
 
-[Route("api/[Controller]") ]
+[Route("api/products") ]
 [ApiController]
 [Authorize]
 [Produces("application/json")]
