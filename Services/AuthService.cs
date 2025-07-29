@@ -66,7 +66,8 @@ public class AuthService : IAuthService
             claims = new[]
             {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim("username", user.Username)
+            new Claim("username", user.Username),
+            new Claim("role", user.Role)
         };
         }
         else
