@@ -1,5 +1,4 @@
-﻿using DotNetEnv;
-using AutoMapper;
+﻿using AutoMapper;
 using itsc_dotnet_practice.Data;
 using itsc_dotnet_practice.Document;
 using itsc_dotnet_practice.Document.Interface;
@@ -20,19 +19,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load .env variables
-Env.Load();
-
 // Read DB & JWT values with defaults to avoid errors
-var dbHost = Env.GetString("DB_HOST") ?? "localhost";
-var dbPort = Env.GetString("DB_PORT") ?? "5432";
-var dbName = Env.GetString("DB_NAME") ?? "your_db";
-var dbUser = Env.GetString("DB_USER") ?? "user";
-var dbPass = Env.GetString("DB_PASSWORD") ?? "pass";
+string dbHost = builder.Configuration["DB_HOST"] ?? "localhost";
+string dbPort = builder.Configuration["DB_PORT"] ?? "5432";
+string dbName = builder.Configuration["DB_NAME"] ?? "your_db";
+string dbUser = builder.Configuration["DB_USER"] ?? "user";
+string dbPass = builder.Configuration["DB_PASSWORD"] ?? "pass";
 
-var jwtKey = Env.GetString("JWT_KEY") ?? "your_jwt_secret_key";
-var jwtIssuer = Env.GetString("JWT_ISSUER") ?? "your_issuer";
-var jwtAudience = Env.GetString("JWT_AUDIENCE") ?? "your_audience";
+string jwtKey = builder.Configuration["JWT_KEY"] ?? "your_jwt_secret_key";
+string jwtIssuer = builder.Configuration["JWT_ISSUER"] ?? "your_issuer";
+string jwtAudience = builder.Configuration["JWT_AUDIENCE"] ?? "your_audience";
 
 var connBuilder = new Npgsql.NpgsqlConnectionStringBuilder()
 {

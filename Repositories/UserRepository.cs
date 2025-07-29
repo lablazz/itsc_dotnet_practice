@@ -39,23 +39,10 @@ public class UserRepository : IUserRepository
         return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
     }
 
-    public async Task<User> CreateUserAsync(RegisterRequestDto user)
+    public async Task<User> CreateUserAsync(User user)
     {
-        if (user == null) throw new ArgumentNullException(nameof(user));
-        var existingUser = await GetUserByUsernameAsync(user.Username);
-        if (existingUser != null)
-        {
-            throw new Exception("Username already exists");
-        }
-        if (user.Password != user.ConfirmPassword)
-        {
-            throw new Exception("Passwords do not match");
-        }
-        var newUser = _mapper.Map<User>(user);
-        newUser.Password = EncryptionUtility.HashPassword(user.Password);
-
-        _context.Users.Add(newUser);
+        _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return newUser;
+        return user;
     }
 }
