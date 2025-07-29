@@ -1,9 +1,13 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace itsc_dotnet_practice.Models;
 
 public class OrderDetail
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; } // This will be the same as Order.Id
     public int ProductId { get; set; } // Foreign key to Product
     public int Quantity { get; set; } // Quantity of the product in the order
