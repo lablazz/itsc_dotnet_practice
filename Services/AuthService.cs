@@ -5,6 +5,7 @@ using itsc_dotnet_practice.Models;
 using itsc_dotnet_practice.Models.Dtos;
 using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Services.Interface;
+using itsc_dotnet_practice.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -79,8 +80,7 @@ public class AuthService : IAuthService
 
     public async Task<User> RegisterAsync(RegisterRequestDto register)
     {
-        if (register == null) throw new ArgumentNullException(nameof(register));
-        var existingUser = await _userRepo.GetUserByUsernameAsync(register.Username);
+        User existingUser = await _userRepo.GetUserByUsernameAsync(register.Username);
         if (existingUser != null)
         {
             throw new Exception("Username already exists");
@@ -89,6 +89,14 @@ public class AuthService : IAuthService
         {
             throw new Exception("Passwords do not match");
         }
-        return await _userRepo.CreateUserAsync(register);
+        User newUser = new User
+        {
+            Username = register.Username,
+            FullName = register.FullName,
+            Phone = register.Phone,
+            Password = EncryptionUtility.HashPassword(register.Password),
+            Role = "User"
+        };
+        return await _userRepo.CreateUserAsync(newUser);
     }
 }
