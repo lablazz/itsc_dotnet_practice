@@ -14,7 +14,6 @@ namespace itsc_dotnet_practice.Repositories;
 public class OrderRepository : IOrderRepository
 {
     private readonly AppDbContext _context;
-    // automapper
     private readonly IMapper _mapper;
     public OrderRepository(AppDbContext context, IMapper mapper)
     {
@@ -52,7 +51,7 @@ public class OrderRepository : IOrderRepository
             .Where(o => o.Status == status)
             .Include(o => o.User)
             .Include(o => o.OrderDetails)
-            .ThenInclude(od => od.Product)
+                .ThenInclude(od => od.Product)
             .ToListAsync();
     }
     // to get all orders for spacific user
@@ -67,17 +66,46 @@ public class OrderRepository : IOrderRepository
     }
     public async Task<Order> CreateOrderAsync(OrderDto.OrderRequest request)
     {
-        var order = _mapper.Map<Order>(request);
+        // Map the OrderRequest to Order (without details)
+        Order order = _mapper.Map<Order>(request);
         if (order == null)
         {
             throw new ArgumentNullException(nameof(order), "Order cannot be null.");
         }
+
+        // Initialize the OrderDetails collection
+        order.OrderDetails = new List<OrderDetail>();
+
+        // For each OrderDetailRequest, create an OrderDetail entity
+        foreach (var detailReq in request.OrderDetails)
+        {
+            // Fetch product info for price, name, etc.
+            Product product = await _context.Products.FindAsync(detailReq.ProductId);
+            if (product == null)
+                throw new Exception($"Product with ID {detailReq.ProductId} not found.");
+
+            OrderDetail orderDetail = new OrderDetail
+            (
+                productId: product.Id,
+                quantity: detailReq.Quantity,
+                price: product.Price,
+                productName: product.Name,
+                productImageUrl: product.ImageUrl,
+                productDescription: product.Description,
+                productCategory: product.Category,
+                orderId: 0, // Will be set by EF after order is saved
+                userId: request.UserId
+            );
+
+            order.OrderDetails.Add(orderDetail);
+        }
+
         _context.Orders.Add(order);
         _context.SaveChanges();
         return order;
     }
 
-    // to change status of order from "Pending" to "confirmed", "Processing", "Completed", or "Cancelled"
+    // to change status of order from "Pending" -> "confirmed" -> "Processing" -> "Completed" -> "Cancelled"
     public async Task<Order> UpdateOrderStatusAsync(int orderId, string newStatus)
     {
         if (string.IsNullOrEmpty(newStatus))
