@@ -66,8 +66,9 @@ public class AuthService : IAuthService
             claims = new[]
             {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim("username", user.Username)
-        };
+            new Claim("username", user.Username),
+            new Claim("role", user.Role)
+            };
         }
         else
         {
@@ -79,9 +80,8 @@ public class AuthService : IAuthService
             new Claim("fullName", user.FullName),
             new Claim("role", user.Role),
             new Claim("phone", user.Phone)
-        };
+            };
         }
-
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT_KEY"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
