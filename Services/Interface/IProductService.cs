@@ -9,6 +9,7 @@ namespace itsc_dotnet_practice.Services.Interface
     {
         Task<IEnumerable<Product>> GetAllProductsAsync();
         Task<Product?> GetProductByIdAsync(int id);
+        Task<List<Product>> GetProductByQuery(string query);
         Task<Product> CreateProductAsync(ProductDto.Request productDto);
         Task<Product> UpdateProductAsync(int id, Product productDto);
         Task<bool> DeleteProductAsync(int id);

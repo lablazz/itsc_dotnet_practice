@@ -4,6 +4,7 @@ using itsc_dotnet_practice.Models.Dtos;
 using itsc_dotnet_practice.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Repositories;
@@ -24,6 +25,12 @@ public class ProductRepository : IProductRepository
     public async Task<Product?> GetProductByIdAsync(int id)
     {
         return await _context.Products.FindAsync(id);
+    }
+    public async Task<List<Product>> GetProductByQuery(string query)
+    {
+        return await _context.Products
+            .Where(p => p.Name.Contains(query) || p.Description.Contains(query))
+            .ToListAsync();
     }
     public async Task<Product> CreateProductAsync(ProductDto.Request product)
     {

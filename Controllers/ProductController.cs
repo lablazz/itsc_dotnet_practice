@@ -36,6 +36,13 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string q)
+    {
+        var products = await _productService.GetProductByQuery(q);
+        return Ok(products);
+    }
+
     [HttpPost()]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateProduct([FromBody] ProductDto.Request productDto)

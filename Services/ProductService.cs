@@ -25,6 +25,10 @@ public class ProductService : IProductService
     {
         return await _repo.GetProductByIdAsync(id);
     }
+    public async Task<List<Product>> GetProductByQuery(string query)
+    {
+        return await _repo.GetProductByQuery(query);
+    }
     public async Task<Product> CreateProductAsync(ProductDto.Request productDto)
     {
         return await _repo.CreateProductAsync(productDto);
