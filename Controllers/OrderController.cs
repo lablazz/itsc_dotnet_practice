@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/orders")]
 [ApiController]
 public class OrderController : ControllerBase
 {
@@ -55,17 +55,27 @@ public class OrderController : ControllerBase
         return Ok(orders);
     }
 
-    // Admin only: Create new order
+    // Create new order
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult<Order>> CreateOrder([FromBody] OrderDto.OrderRequest request)
     {
         var newOrder = await _service.CreateOrderAsync(request);
         return CreatedAtAction(nameof(GetAllOrders), new { id = newOrder.Id }, newOrder);
     }
+    // User can update order details
+    [HttpPut("{orderId}")]
+    [Authorize]
+    public async Task<ActionResult<Order>> UpdateShippingAddress(int orderId, [FromBody] string newShippingAddress)
+    {
+        var updatedOrder = await _service.UpdateShippingAddressAsync(orderId, newShippingAddress);
+        if (updatedOrder == null)
+            return NotFound($"Order with ID {orderId} not found.");
+        return Ok(updatedOrder);
+    }
 
     // User can cancel own order by orderId (update status to "Cancel")
-    [HttpPut("{orderId}/cancel")]
+    [HttpDelete("{orderId}/cancel")]
     [Authorize]
     public async Task<ActionResult<Order>> CancelOrder(int orderId)
     {
