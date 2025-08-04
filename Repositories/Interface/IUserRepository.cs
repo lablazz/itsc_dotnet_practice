@@ -6,7 +6,7 @@ namespace itsc_dotnet_practice.Repositories.Interface;
 
 public interface IUserRepository
 {
-    Task<User?> GetUserAsync(string username, string password);
-    Task<User?> GetUserByUsernameAsync(string username);
-    Task<User> CreateUserAsync(User user);
+    Task<User?> GetUser(string username, string password);
+    Task<User?> GetUserByUsername(string username);
+    Task<User> CreateUser(User user);
 }

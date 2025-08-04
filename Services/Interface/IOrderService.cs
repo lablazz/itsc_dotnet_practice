@@ -8,12 +8,13 @@ namespace itsc_dotnet_practice.Services.Interface;
 // Services/Interface/IOrderService.cs
 public interface IOrderService
 {
-    Task<List<Order>> GetAllOrdersAsync();
-    Task<List<Order>> GetOrdersByStatusAsync(string status);
-    Task<List<Order>> GetOrdersByUserIdAsync(int userId);
-    Task<List<Order>> GetOrdersByUserIdAndStatusAsync(int userId, string status);
-    Task<Order> CreateOrderAsync(OrderDto.OrderRequest request);
-    Task<Order> UpdateShippingAddressAsync(int orderId, string newShippingAddress);
-    Task<Order> CancelOrderAsync(int orderId);
+    Task<List<Order>> GetAllOrders();
+    Task<List<Order>> GetOrdersByStatus(string status);
+    Task<List<Order>> GetOrdersByUserId(int userId);
+    Task<List<Order>> GetOrdersByUserIdAndStatus(int userId, string status);
+    Task<Order> CreateOrder(OrderDto.OrderRequest request);
+    Task<Order> UpdateShippingAddress(int orderId, string newShippingAddress);
+    Task<Order> CancelOrder(int orderId);
+    Task<List<Order>> ApproveOrder(OrderApprovalDto orderRequest);
 }
 

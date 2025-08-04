@@ -6,9 +6,9 @@ namespace itsc_dotnet_practice.Services.Interface;
 
 public interface IAuthService
 {
-    Task<User?> AuthenticateAsync(LoginRequestDto login);
+    Task<User?> Authenticate(LoginRequestDto login);
     User? ValidateBasicAuth(string authHeader);
     string GenerateJwtToken(User user);
-    Task<User> RegisterAsync(RegisterRequestDto register);
+    Task<User> Register(RegisterRequestDto register);
 
 }

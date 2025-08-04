@@ -22,39 +22,39 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet()]
-    public async Task<IActionResult> GetAllProducts()
+    public async Task<IActionResult> GetAllProducts([FromQuery] string? q)
     {
-        var products = await _productService.GetAllProductsAsync();
-        return Ok(products);
+        if (string.IsNullOrEmpty(q))
+        {
+            var products = await _productService.GetAllProducts();
+            return Ok(products);
+        } else
+        {
+            var products = await _productService.GetProductByQuery(q);
+            return Ok(products);
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id)
     {
-        var product = await _productService.GetProductByIdAsync(id);
+        var product = await _productService.GetProductById(id);
         if (product == null) return NotFound("Product not found");
         return Ok(product);
-    }
-
-    [HttpGet("search")]
-    public async Task<IActionResult> SearchProducts([FromQuery] string q)
-    {
-        var products = await _productService.GetProductByQuery(q);
-        return Ok(products);
     }
 
     [HttpPost()]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateProduct([FromBody] ProductDto.Request productDto)
     {
-        var createdProduct = await _productService.CreateProductAsync(productDto);
+        var createdProduct = await _productService.CreateProduct(productDto);
         return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
     }
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product productDto)
     {
-        var updatedProduct = await _productService.UpdateProductAsync(id, productDto);
+        var updatedProduct = await _productService.UpdateProduct(id, productDto);
         if (updatedProduct == null) return NotFound("Product not found");
         return Ok(updatedProduct);
     }
@@ -62,7 +62,7 @@ public class ProductController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
-        var isDeleted = await _productService.DeleteProductAsync(id);
+        var isDeleted = await _productService.DeleteProduct(id);
         if (!isDeleted) return NotFound("Product not found");
         return NoContent();
     }

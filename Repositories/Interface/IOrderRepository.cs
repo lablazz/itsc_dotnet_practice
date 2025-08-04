@@ -8,12 +8,13 @@ namespace itsc_dotnet_practice.Repositories.Interface;
 // Repositories/Interface/IOrderRepository.cs
 public interface IOrderRepository
 {
-    Task<List<Order>> GetAllOrdersAsync();
-    Task<List<Order>> GetOrdersByStatusAsync(string status);
-    Task<List<Order>> GetOrdersByUserIdAsync(int userId);
-    Task<Order> CreateOrderAsync(OrderDto.OrderRequest request);
-    Task<Order> UpdateOrderStatusAsync(int orderId, string newStatus);
-    Task<Order> UpdateShippingAddressAsync(int orderId, string newShippingAddress);
-    Task<Order> CancelOrderAsync(int orderId);
+    Task<List<Order>> GetAllOrders();
+    Task<Order> GetOrderById(int orderId);
+    Task<List<Order>> GetOrdersByStatus(string status);
+    Task<List<Order>> GetOrdersByUserId(int userId);
+    Task<Order> CreateOrder(OrderDto.OrderRequest request);
+    Task<Order> UpdateOrderStatus(int orderId, string newStatus);
+    Task<Order> UpdateShippingAddress(int orderId, string newShippingAddress);
+    Task<Order> CancelOrder(int orderId);
 }
 

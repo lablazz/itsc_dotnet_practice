@@ -17,28 +17,28 @@ public class ProductService : IProductService
         _repo = repo;
     }
 
-    public async Task<IEnumerable<Product>> GetAllProductsAsync()
+    public async Task<IEnumerable<Product>> GetAllProducts()
     {
-        return (IEnumerable<Product>) await _repo.GetAllProductsAsync();
+        return await _repo.GetAllProducts();
     }
-    public async Task<Product?> GetProductByIdAsync(int id)
+    public async Task<Product?> GetProductById(int id)
     {
-        return await _repo.GetProductByIdAsync(id);
+        return await _repo.GetProductById(id);
     }
     public async Task<List<Product>> GetProductByQuery(string query)
     {
         return await _repo.GetProductByQuery(query);
     }
-    public async Task<Product> CreateProductAsync(ProductDto.Request productDto)
+    public async Task<Product> CreateProduct(ProductDto.Request productDto)
     {
-        return await _repo.CreateProductAsync(productDto);
+        return await _repo.CreateProduct(productDto);
     }
-    public async Task<Product> UpdateProductAsync(int id, Product productDto)
+    public async Task<Product> UpdateProduct(int id, Product productDto)
     {
-        return await _repo.UpdateProductAsync(id, productDto);
+        return await _repo.UpdateProduct(id, productDto);
     }
-    public async Task<bool> DeleteProductAsync(int id)
+    public async Task<bool> DeleteProduct(int id)
     {
-        return await _repo.DeleteProductAsync(id);
+        return await _repo.DeleteProduct(id);
     }
 }

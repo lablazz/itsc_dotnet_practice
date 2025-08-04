@@ -7,6 +7,7 @@ using itsc_dotnet_practice.Repositories.Interface;
 using itsc_dotnet_practice.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Repositories;
@@ -22,9 +23,9 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
-    public async Task<User?> GetUserAsync(string username, string password)
+    public async Task<User?> GetUser(string username, string password)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        var user = _context.Users.FirstOrDefault(u => u.Username == username);
 
         if (user == null || !EncryptionUtility.VerifyPassword(password, user.Password))
         {
@@ -34,15 +35,15 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User?> GetUserByUsernameAsync(string username)
+    public async Task<User?> GetUserByUsername(string username)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return _context.Users.FirstOrDefault(u => u.Username == username);
     }
 
-    public async Task<User> CreateUserAsync(User user)
+    public async Task<User> CreateUser(User user)
     {
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return user;
     }
 }

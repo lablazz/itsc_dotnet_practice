@@ -27,9 +27,9 @@ public class AuthService : IAuthService
         _config = config;
     }
 
-    public async Task<User?> AuthenticateAsync(LoginRequestDto login)
+    public async Task<User?> Authenticate(LoginRequestDto login)
     {
-        return await _userRepo.GetUserAsync(login.Username, login.Password);
+        return await _userRepo.GetUser(login.Username, login.Password);
     }
 
     public User? ValidateBasicAuth(string authHeader)
@@ -97,9 +97,9 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<User> RegisterAsync(RegisterRequestDto register)
+    public async Task<User> Register(RegisterRequestDto register)
     {
-        User existingUser = await _userRepo.GetUserByUsernameAsync(register.Username);
+        User existingUser = await _userRepo.GetUserByUsername(register.Username);
         if (existingUser != null)
         {
             throw new Exception("Username already exists");
@@ -116,6 +116,6 @@ public class AuthService : IAuthService
             Password = EncryptionUtility.HashPassword(register.Password),
             Role = "User"
         };
-        return await _userRepo.CreateUserAsync(newUser);
+        return await _userRepo.CreateUser(newUser);
     }
 }

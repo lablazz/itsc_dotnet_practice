@@ -18,21 +18,21 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Product>> GetAllProductsAsync()
+    public async Task<IEnumerable<Product>> GetAllProducts()
     {
-        return await _context.Products.ToListAsync();
+        return _context.Products.ToList();
     }
-    public async Task<Product?> GetProductByIdAsync(int id)
+    public async Task<Product?> GetProductById(int id)
     {
-        return await _context.Products.FindAsync(id);
+        return _context.Products.Find(id);
     }
     public async Task<List<Product>> GetProductByQuery(string query)
     {
-        return await _context.Products
+        return _context.Products
             .Where(p => p.Name.Contains(query) || p.Description.Contains(query))
-            .ToListAsync();
+            .ToList();
     }
-    public async Task<Product> CreateProductAsync(ProductDto.Request product)
+    public async Task<Product> CreateProduct(ProductDto.Request product)
     {
         var newProduct = new Product
         {
@@ -47,9 +47,9 @@ public class ProductRepository : IProductRepository
         _context.SaveChanges();
         return newProduct;
     }
-    public async Task<Product> UpdateProductAsync(int id, Product product)
+    public async Task<Product> UpdateProduct(int id, Product product)
     {
-        var existingProduct = await _context.Products.FindAsync(id);
+        var existingProduct = _context.Products.Find(id);
         if (existingProduct == null) return null;
         existingProduct.Name = product.Name;
         existingProduct.Price = product.Price;
@@ -58,9 +58,9 @@ public class ProductRepository : IProductRepository
         _context.SaveChanges();
         return existingProduct;
     }
-    public async Task<bool> DeleteProductAsync(int id)
+    public async Task<bool> DeleteProduct(int id)
     {
-        var product = await _context.Products.FindAsync(id);
+        var product = _context.Products.Find(id);
         if (product == null) return false;
         _context.Products.Remove(product);
         _context.SaveChanges();

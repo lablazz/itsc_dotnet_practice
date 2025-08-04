@@ -19,19 +19,17 @@ public class Order
     public string ShippingAddress { get; set; } = "";
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public User User { get; set; }
 
     public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    public Order() { }
+    public Order()
+    { }
 
     public Order(int userId)
     {
         UserId = userId;
     }
 }
-

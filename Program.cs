@@ -22,9 +22,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Read DB & JWT values with defaults to avoid errors
 string dbHost = builder.Configuration["DB_HOST"] ?? "localhost";
 string dbPort = builder.Configuration["DB_PORT"] ?? "5432";
-string dbName = builder.Configuration["DB_NAME"] ?? "your_db";
-string dbUser = builder.Configuration["DB_USER"] ?? "user";
-string dbPass = builder.Configuration["DB_PASSWORD"] ?? "pass";
+string dbName = builder.Configuration["DB_NAME"] ?? "myappdb";
+string dbUser = builder.Configuration["DB_USER"] ?? "postgres";
+string dbPass = builder.Configuration["DB_PASSWORD"] ?? "yourpassword";
 
 string jwtKey = builder.Configuration["JWT_KEY"] ?? "your_jwt_secret_key";
 string jwtIssuer = builder.Configuration["JWT_ISSUER"] ?? "your_issuer";
@@ -50,6 +50,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<UserProfile>();
+    cfg.AddProfile<OrderProfile>();
 });
 
 // Register repositories and services
@@ -140,7 +141,7 @@ using (var scope = app.Services.CreateScope())
     UserSeeder.Seed(db);
 
     // Seed products from Pokémon API
-    await ProductSeeder.SeedAsync(services);
+    await ProductSeeder.Seed(services);
 }
 
 app.UseAuthentication();

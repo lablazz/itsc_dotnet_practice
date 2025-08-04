@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using itsc_dotnet_practice.Services.Interface;
 using System.Threading.Tasks;
+using itsc_dotnet_practice.Models.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace itsc_dotnet_practice.Controllers;
 
@@ -9,7 +12,12 @@ namespace itsc_dotnet_practice.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly IAuthService _authService;
-    public AdminController(IAuthService authService) => _authService = authService;
+    private readonly IOrderService _orderService;
+    public AdminController(IAuthService authService, IOrderService orderService)
+    {
+        _authService = authService;
+        _orderService = orderService;
+    }
 
     [HttpGet("login")]
     public IActionResult Dashboard()
@@ -23,17 +31,15 @@ public class AdminController : ControllerBase
         return Ok(new { token });
     }
 
-    //[HttpPost("approve-order")]
-    //public async Task<IActionResult> ApproveOrder([FromBody] Models.Dtos.OrderDto.OrderRequest orderRequest)
-    //{
-    //    var authHeader = Request.Headers["Authorization"].ToString();
-    //    var user = _authService.ValidateBasicAuth(authHeader);
-    //    if (user == null || user.Role != "Admin")
-    //        return Unauthorized("Admin access only");
-    //    var result = await _authService.ApproveOrder(orderRequest);
-    //    if (result.IsSuccess)
-    //        return Ok(result.Data);
-
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpPost("approve-order")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ApproveOrder([FromBody] OrderApprovalDto orderRequest)
+    {
+        if (orderRequest == null || orderRequest.OrderIds.Count == 0)
+            return BadRequest("Order request cannot be null or empty");
+        var result = await _orderService.ApproveOrder(orderRequest);
+        if (result == null || result.Count == 0)
+            return NotFound("No orders found to approve");
+        return Ok("Order approved successfully");
+    }
 }

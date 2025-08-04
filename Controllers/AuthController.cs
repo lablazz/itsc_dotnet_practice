@@ -15,7 +15,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto login)
     {
-        var user = await _authService.AuthenticateAsync(login);
+        var user = await _authService.Authenticate(login);
         if (user == null) return Unauthorized("Invalid credentials");
         var token = _authService.GenerateJwtToken(user);
         return Ok(new { token });
@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto register)
     {
-        var result = await _authService.RegisterAsync(register);
+        var result = await _authService.Register(register);
         if (result == null) return BadRequest("Username already exists");
 
         return Ok("User registered successfully");
