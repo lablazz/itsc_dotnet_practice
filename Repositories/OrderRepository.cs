@@ -50,7 +50,7 @@ public class OrderRepository : IOrderRepository
         {
             throw new ArgumentException("Status cannot be null or empty.", nameof(status));
         }
-        var validStatuses = new[] { "pending", "confirmed", "processing", "completed", "cancelled" };
+        var validStatuses = new[] { "pending", "confirm", "reject", "cancel" };
         if (!validStatuses.Contains(status.ToLower()))
         {
             throw new ArgumentException($"Invalid status. Valid statuses are: {string.Join(", ", validStatuses)}", nameof(status));
