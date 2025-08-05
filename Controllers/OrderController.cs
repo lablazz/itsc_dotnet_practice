@@ -25,7 +25,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize]
     public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetAllOrders([FromQuery] string? status)
     {
         var role = User.FindFirst("role")?.Value;
