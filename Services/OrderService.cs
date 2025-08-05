@@ -43,32 +43,9 @@ public class OrderService : IOrderService
         return await _repo.CreateOrder(request, userId);
     }
 
-    public async Task<List<Order>> ApproveOrder(OrderApprovalDto orderRequest)
-    {
-        if (orderRequest == null || orderRequest.OrderIds.Count == 0)
-        {
-            throw new ArgumentNullException(nameof(orderRequest), "Order request cannot be null or empty");
-        }
-        var orders = new List<Order>();
-        foreach (var orderId in orderRequest.OrderIds)
-        {
-            var order = await _repo.GetOrderById(orderId);
-            if (order == null)
-            {
-                throw new KeyNotFoundException($"Order with ID {orderId} not found");
-            }
-            if (order.Status != "Pending")
-            {
-                throw new InvalidOperationException($"Order with ID {orderId} is not in a pending state");
-            }
-            orders.Add(await _repo.UpdateOrderStatus(order.Id, "Approved"));
-        }
-        return orders;
-    }
-
     public async Task<Order> UpdateOrderStatus(int orderId, string status)
     {
-        var validStatuses = new[] { "Pending", "Confirm", "Reject", "Cancel" };
+        var validStatuses = new[] { "pending", "confirm", "reject", "cancel" };
 
         var normalizedStatus = status.Trim();
 

@@ -85,7 +85,7 @@ public class OrderRepository : IOrderRepository
         {
             UserId = userId,
             ShippingAddress = request.ShippingAddress,
-            Status = "Pending",
+            Status = "pending",
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             OrderDetails = new List<OrderDetail>()
