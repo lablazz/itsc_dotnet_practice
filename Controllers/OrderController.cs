@@ -71,9 +71,24 @@ public class OrderController : ControllerBase
         {
             return Unauthorized("User ID not found or invalid in token.");
         }
-        var newOrder = await _service.CreateOrder(request, userId);
-        var orderResponse = _mapper.Map<OrderDto.OrderResponse>(newOrder);
-        return CreatedAtAction(nameof(GetAllOrders), new { id = orderResponse.Id }, orderResponse);
+        try
+        {
+            var newOrder = await _service.CreateOrder(request, userId);
+            var orderResponse = _mapper.Map<OrderDto.OrderResponse>(newOrder);
+            return CreatedAtAction(nameof(GetAllOrders), new { id = orderResponse.Id }, orderResponse);
+        }
+        catch (Exception ex) when (ex is ArgumentNullException || ex is InvalidOperationException)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // User can update order status
@@ -87,7 +102,7 @@ public class OrderController : ControllerBase
         }
 
         // Get role from JWT token
-        var role = User.FindFirst("role")?.Value;
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
         if (string.IsNullOrEmpty(role))
         {
@@ -98,14 +113,14 @@ public class OrderController : ControllerBase
         var normalizedStatus = status.Status.Trim().ToLower();
 
         // Role-based validation
-        if (role.Equals("admin", StringComparison.OrdinalIgnoreCase))
+        if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
         {
             if (normalizedStatus != "confirm" && normalizedStatus != "reject")
             {
                 return BadRequest("Admin can only change status to 'confirm' or 'reject'.");
             }
         }
-        else if (role.Equals("user", StringComparison.OrdinalIgnoreCase))
+        else if (role.Equals("User", StringComparison.OrdinalIgnoreCase))
         {
             if (normalizedStatus != "cancel")
             {

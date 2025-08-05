@@ -93,7 +93,6 @@ public class OrderRepository : IOrderRepository
 
         // Add the order to the context and save to generate the OrderId
         _context.Orders.Add(newOrder);
-        _context.SaveChanges();
 
         // Add order details, now that newOrder.Id is available
         foreach (var item in request.OrderDetails)
