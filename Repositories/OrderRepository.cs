@@ -84,7 +84,7 @@ public class OrderRepository : IOrderRepository
         Order newOrder = new Order
         {
             UserId = request.UserId,
-            ShippingAddress = "",
+            ShippingAddress = request.ShippingAddress,
             Status = "Pending",
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -134,18 +134,9 @@ public class OrderRepository : IOrderRepository
         return newOrder;
     }
 
-    // to change status of order from "Pending" -> "confirmed" -> "Processing" -> "Completed" -> "Cancelled"
+    // Pending | Confirm | Reject | Cancel
     public async Task<Order> UpdateOrderStatus(int orderId, string newStatus)
     {
-        if (string.IsNullOrEmpty(newStatus))
-        {
-            throw new ArgumentException("Status cannot be null or empty.", nameof(newStatus));
-        }
-        var validStatuses = new[] { "pending", "confirmed", "processing", "completed", "cancelled" };
-        if (!validStatuses.Contains(newStatus.ToLower()))
-        {
-            throw new ArgumentException($"Invalid status. Valid statuses are: {string.Join(", ", validStatuses)}", nameof(newStatus));
-        }
         var order = _context.Orders.Find(orderId);
         if (order == null)
         {
@@ -153,51 +144,6 @@ public class OrderRepository : IOrderRepository
         }
         order.Status = newStatus;
         order.UpdatedAt = DateTime.UtcNow;
-        _context.Orders.Update(order);
-        _context.SaveChanges();
-        return order;
-    }
-    // to update ShippingAddress in order
-    public async Task<Order> UpdateShippingAddress(int orderId, string newShippingAddress)
-    {
-        if (string.IsNullOrEmpty(newShippingAddress))
-        {
-            throw new ArgumentException("Shipping address cannot be null or empty.", nameof(newShippingAddress));
-        }
-        var order = _context.Orders.Find(orderId);
-        if (order == null)
-        {
-            throw new KeyNotFoundException($"Order with ID {orderId} not found.");
-        }
-        this.UpdateOrderStatus(orderId, "confirmed").Wait();
-        order.ShippingAddress = newShippingAddress;
-        order.UpdatedAt = DateTime.UtcNow;
-        order.OrderDetails = _context.OrderDetails
-            .Where(od => od.OrderId == orderId)
-            .Include(od => od.Product)
-            .ToList();
-        _context.Orders.Update(order);
-        _context.SaveChanges();
-        return order;
-    }
-    // update status to "Cancelled" for user
-    public async Task<Order> CancelOrder(int orderId)
-    {
-        var order = _context.Orders.Find(orderId);
-        if (order == null)
-        {
-            throw new KeyNotFoundException($"Order with ID {orderId} not found.");
-        }
-        if (order.Status == "Cancelled")
-        {
-            throw new InvalidOperationException($"Order with ID {orderId} is already cancelled.");
-        }
-        order.Status = "Cancelled";
-        order.UpdatedAt = DateTime.UtcNow;
-        order.OrderDetails = _context.OrderDetails
-            .Where(od => od.OrderId == orderId)
-            .Include(od => od.Product)
-            .ToList();
         _context.Orders.Update(order);
         _context.SaveChanges();
         return order;

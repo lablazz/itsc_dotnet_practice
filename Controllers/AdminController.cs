@@ -30,16 +30,4 @@ public class AdminController : ControllerBase
 
         return Ok(new { token });
     }
-
-    [HttpPost("approve-order")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ApproveOrder([FromBody] OrderApprovalDto orderRequest)
-    {
-        if (orderRequest == null || orderRequest.OrderIds.Count == 0)
-            return BadRequest("Order request cannot be null or empty");
-        var result = await _orderService.ApproveOrder(orderRequest);
-        if (result == null || result.Count == 0)
-            return NotFound("No orders found to approve");
-        return Ok("Order approved successfully");
-    }
 }

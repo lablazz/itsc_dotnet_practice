@@ -14,7 +14,5 @@ public interface IOrderRepository
     Task<List<Order>> GetOrdersByUserId(int userId);
     Task<Order> CreateOrder(OrderDto.OrderRequest request);
     Task<Order> UpdateOrderStatus(int orderId, string newStatus);
-    Task<Order> UpdateShippingAddress(int orderId, string newShippingAddress);
-    Task<Order> CancelOrder(int orderId);
 }
 

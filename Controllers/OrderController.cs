@@ -4,6 +4,7 @@ using itsc_dotnet_practice.Models.Dtos;
 using itsc_dotnet_practice.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -22,42 +23,30 @@ public class OrderController : ControllerBase
         _mapper = mapper;
     }
 
-    // Admin only: Get all orders
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetAllOrders()
+    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetAllOrders(
+        [FromQuery] string? status,
+        [FromQuery] int? userId
+        )
     {
-        var orders = await _service.GetAllOrders();
-        var orderResponses = _mapper.Map<List<OrderDto.OrderResponse>>(orders);
-        return Ok(orderResponses);
-    }
-
-    // Admin only: Get orders by status
-    [HttpGet("status/{status}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetOrdersByStatus(string status)
-    {
-        var orders = await _service.GetOrdersByStatus(status);
-        var orderResponses = _mapper.Map<List<OrderDto.OrderResponse>>(orders);
-        return Ok(orderResponses);
-    }
-
-    // Admin only: Get orders by userId
-    [HttpGet("user/{userId}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetOrdersByUserId(int userId)
-    {
-        var orders = await _service.GetOrdersByUserId(userId);
-        var orderResponses = _mapper.Map<List<OrderDto.OrderResponse>>(orders);
-        return Ok(orderResponses);
-    }
-
-    // Admin only: Get orders by userId and status
-    [HttpGet("user/{userId}/status/{status}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetOrdersByUserIdAndStatus(int userId, string status)
-    {
-        var orders = await _service.GetOrdersByUserIdAndStatus(userId, status);
+        List<Order> orders;
+        if (status != null && userId.HasValue)
+        {
+            orders = await _service.GetOrdersByUserIdAndStatus(userId.Value, status);
+        }
+        else if (status != null)
+        {
+            orders = await _service.GetOrdersByStatus(status);
+        }
+        else if (userId.HasValue)
+        {
+            orders = await _service.GetOrdersByUserId(userId.Value);
+        }
+        else
+        {
+            orders = await _service.GetAllOrders();
+        }
         var orderResponses = _mapper.Map<List<OrderDto.OrderResponse>>(orders);
         return Ok(orderResponses);
     }
@@ -72,30 +61,56 @@ public class OrderController : ControllerBase
         return CreatedAtAction(nameof(GetAllOrders), new { id = orderResponse.Id }, orderResponse);
     }
 
-    // User can update order details
-    [HttpPut("shipping/{orderId}")]
+    // User can update order status
+    [HttpPut("{orderId}")]
     [Authorize]
-    public async Task<ActionResult<OrderDto.OrderResponse>> UpdateShippingAddress(int orderId, [FromBody] string newShippingAddress)
+    public async Task<ActionResult<OrderDto.OrderResponse>> ChangeOrderStatus(int orderId, [FromBody] OrderStatusUpdateDto status)
     {
-        var updatedOrder = await _service.UpdateShippingAddress(orderId, newShippingAddress);
+        if (status == null || string.IsNullOrEmpty(status.Status))
+        {
+            throw new ArgumentNullException(nameof(status), "Status update cannot be null or empty");
+        }
+
+        // Get role from JWT token
+        var role = User.FindFirst("role")?.Value;
+
+        if (string.IsNullOrEmpty(role))
+        {
+            return Unauthorized("Role not found in token.");
+        }
+
+        // Normalize status
+        var normalizedStatus = status.Status.Trim().ToLower();
+
+        // Role-based validation
+        if (role.Equals("admin", StringComparison.OrdinalIgnoreCase))
+        {
+            if (normalizedStatus != "confirm" && normalizedStatus != "reject")
+            {
+                return BadRequest("Admin can only change status to 'confirm' or 'reject'.");
+            }
+        }
+        else if (role.Equals("user", StringComparison.OrdinalIgnoreCase))
+        {
+            if (normalizedStatus != "cancel")
+            {
+                return BadRequest("User can only change status to 'cancel'.");
+            }
+        }
+        else
+        {
+            return Forbid("Only admin or user roles are allowed to update status.");
+        }
+
+        // Update order status
+        Order updatedOrder = await _service.UpdateOrderStatus(orderId, normalizedStatus);
         if (updatedOrder == null)
+        {
             return NotFound($"Order with ID {orderId} not found.");
-        
+        }
+
         var orderResponse = _mapper.Map<OrderDto.OrderResponse>(updatedOrder);
         return Ok(orderResponse);
     }
 
-    // User can cancel own order by orderId (update status to "Cancel")
-    [HttpDelete("{orderId}/cancel")]
-    [Authorize]
-    public async Task<ActionResult<OrderDto.OrderResponse>> CancelOrder(int orderId)
-    {
-        var cancelledOrder = await _service.CancelOrder(orderId);
-
-        if (cancelledOrder == null)
-            return NotFound($"Order with ID {orderId} not found or can't be cancelled.");
-
-        var orderResponse = _mapper.Map<OrderDto.OrderResponse>(cancelledOrder);
-        return Ok(orderResponse);
-    }
 }

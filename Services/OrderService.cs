@@ -5,6 +5,7 @@ using itsc_dotnet_practice.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Services;
@@ -41,14 +42,6 @@ public class OrderService : IOrderService
     {
         return await _repo.CreateOrder(request);
     }
-    public async Task<Order> UpdateShippingAddress(int orderId, string newShippingAddress)
-    {
-        return await _repo.UpdateShippingAddress(orderId, newShippingAddress);
-    }
-    public async Task<Order> CancelOrder(int orderId)
-    {
-        return await _repo.CancelOrder(orderId);
-    }
 
     public async Task<List<Order>> ApproveOrder(OrderApprovalDto orderRequest)
     {
@@ -72,4 +65,19 @@ public class OrderService : IOrderService
         }
         return orders;
     }
+
+    public async Task<Order> UpdateOrderStatus(int orderId, string status)
+    {
+        var validStatuses = new[] { "Pending", "Confirm", "Reject", "Cancel" };
+
+        var normalizedStatus = status.Trim();
+
+        if (!validStatuses.Contains(normalizedStatus, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException($"Invalid status. Valid statuses are: {string.Join(", ", validStatuses)}", nameof(status));
+        }
+
+        return await _repo.UpdateOrderStatus(orderId, normalizedStatus);
+    }
+
 }

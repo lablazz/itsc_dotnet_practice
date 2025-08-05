@@ -13,8 +13,6 @@ public interface IOrderService
     Task<List<Order>> GetOrdersByUserId(int userId);
     Task<List<Order>> GetOrdersByUserIdAndStatus(int userId, string status);
     Task<Order> CreateOrder(OrderDto.OrderRequest request);
-    Task<Order> UpdateShippingAddress(int orderId, string newShippingAddress);
-    Task<Order> CancelOrder(int orderId);
-    Task<List<Order>> ApproveOrder(OrderApprovalDto orderRequest);
+    Task<Order> UpdateOrderStatus(int orderId, string status);
 }
 
