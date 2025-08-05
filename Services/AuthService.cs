@@ -66,6 +66,7 @@ public class AuthService : IAuthService
     {
         new Claim("userId", isAdmin ? "Admin" : user.Id.ToString()),
         new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Role, user.Role),
         new Claim("username", user.Username),
         new Claim("role", user.Role)
     };
@@ -75,7 +76,6 @@ public class AuthService : IAuthService
             claims.AddRange(new[]
             {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role),
             new Claim("fullName", user.FullName),
             new Claim("phone", user.Phone)
         });

@@ -28,12 +28,11 @@ public class OrderController : ControllerBase
     [Authorize]
     public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetAllOrders([FromQuery] string? status)
     {
-        var role = User.FindFirst("role")?.Value;
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        if (string.IsNullOrEmpty(role) || string.IsNullOrEmpty(userIdClaim))
+        if (string.IsNullOrEmpty(role))
         {
-            return Unauthorized("User role or ID not found in token.");
+            return Unauthorized("User role not found in token.");
         }
 
         List<Order> orders;
@@ -46,6 +45,8 @@ public class OrderController : ControllerBase
         }
         else // User role
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (!int.TryParse(userIdClaim, out var userId))
             {
                 return BadRequest("Invalid user ID format.");

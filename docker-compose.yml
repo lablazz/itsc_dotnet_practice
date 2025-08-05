@@ -29,13 +29,13 @@ services:
 
     ports:
       - "${DB_PORT}:5432"
-    # volumes:
-    #   - pgdata:/var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
       - backend
 
-# volumes:
-#   pgdata:
+volumes:
+  pgdata:
 
 networks:
   backend:
