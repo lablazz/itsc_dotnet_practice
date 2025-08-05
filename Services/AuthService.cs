@@ -9,6 +9,7 @@ using itsc_dotnet_practice.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -59,28 +60,25 @@ public class AuthService : IAuthService
 
     public string GenerateJwtToken(User user)
     {
-        Claim[] claims;
+        var isAdmin = user.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
 
-        if (user.Role.Equals("admin", StringComparison.OrdinalIgnoreCase))
+        var claims = new List<Claim>
+    {
+        new Claim("userId", isAdmin ? "Admin" : user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim("username", user.Username),
+        new Claim("role", user.Role)
+    };
+
+        if (!isAdmin)
         {
-            claims = new[]
+            claims.AddRange(new[]
             {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("username", user.Username),
-            new Claim("role", user.Role)
-            };
-        }
-        else
-        {
-            claims = new[]
-            {
-            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Role, user.Role),
-            new Claim("username", user.Username),
             new Claim("fullName", user.FullName),
-            new Claim("role", user.Role),
             new Claim("phone", user.Phone)
-            };
+        });
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT_KEY"]!));

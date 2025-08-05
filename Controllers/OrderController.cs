@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace itsc_dotnet_practice.Controllers;
@@ -24,29 +25,37 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetAllOrders(
-        [FromQuery] string? status,
-        [FromQuery] int? userId
-        )
+    [Authorize(Roles = "Admin, User")]
+    public async Task<ActionResult<List<OrderDto.OrderResponse>>> GetAllOrders([FromQuery] string? status)
     {
+        var role = User.FindFirst("role")?.Value;
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(role) || string.IsNullOrEmpty(userIdClaim))
+        {
+            return Unauthorized("User role or ID not found in token.");
+        }
+
         List<Order> orders;
-        if (status != null && userId.HasValue)
+
+        if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
         {
-            orders = await _service.GetOrdersByUserIdAndStatus(userId.Value, status);
+            orders = status != null
+                ? await _service.GetOrdersByStatus(status)
+                : await _service.GetAllOrders();
         }
-        else if (status != null)
+        else // User role
         {
-            orders = await _service.GetOrdersByStatus(status);
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return BadRequest("Invalid user ID format.");
+            }
+
+            orders = status != null
+                ? await _service.GetOrdersByUserIdAndStatus(userId, status)
+                : await _service.GetOrdersByUserId(userId);
         }
-        else if (userId.HasValue)
-        {
-            orders = await _service.GetOrdersByUserId(userId.Value);
-        }
-        else
-        {
-            orders = await _service.GetAllOrders();
-        }
+
         var orderResponses = _mapper.Map<List<OrderDto.OrderResponse>>(orders);
         return Ok(orderResponses);
     }
@@ -56,7 +65,12 @@ public class OrderController : ControllerBase
     [Authorize]
     public async Task<ActionResult<OrderDto.OrderResponse>> CreateOrder([FromBody] OrderDto.OrderRequest request)
     {
-        var newOrder = await _service.CreateOrder(request);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized("User ID not found or invalid in token.");
+        }
+        var newOrder = await _service.CreateOrder(request, userId);
         var orderResponse = _mapper.Map<OrderDto.OrderResponse>(newOrder);
         return CreatedAtAction(nameof(GetAllOrders), new { id = orderResponse.Id }, orderResponse);
     }
@@ -112,5 +126,4 @@ public class OrderController : ControllerBase
         var orderResponse = _mapper.Map<OrderDto.OrderResponse>(updatedOrder);
         return Ok(orderResponse);
     }
-
 }

@@ -12,7 +12,7 @@ public interface IOrderRepository
     Task<Order> GetOrderById(int orderId);
     Task<List<Order>> GetOrdersByStatus(string status);
     Task<List<Order>> GetOrdersByUserId(int userId);
-    Task<Order> CreateOrder(OrderDto.OrderRequest request);
+    Task<Order> CreateOrder(OrderDto.OrderRequest request, int userId);
     Task<Order> UpdateOrderStatus(int orderId, string newStatus);
 }
 

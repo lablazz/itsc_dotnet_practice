@@ -78,12 +78,12 @@ public class OrderRepository : IOrderRepository
             .ThenInclude(od => od.Product)
             .ToList();
     }
-    public async Task<Order> CreateOrder(OrderDto.OrderRequest request)
+    public async Task<Order> CreateOrder(OrderDto.OrderRequest request, int userId)
     {
         // Create the order entity
         Order newOrder = new Order
         {
-            UserId = request.UserId,
+            UserId = userId,
             ShippingAddress = request.ShippingAddress,
             Status = "Pending",
             CreatedAt = DateTime.UtcNow,
@@ -119,7 +119,7 @@ public class OrderRepository : IOrderRepository
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 OrderId = newOrder.Id,
-                UserId = request.UserId
+                UserId = userId
             };
             newOrder.OrderDetails.Add(orderDetail);
 

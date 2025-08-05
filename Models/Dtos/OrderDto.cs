@@ -8,7 +8,6 @@ public class OrderDto
 {
     public class OrderRequest
     {
-        public int UserId { get; set; }
         public string ShippingAddress { get; set; }
         public List<OrderDetailDto.OrderDetailRequest> OrderDetails { get; set; } = new();
     }
@@ -17,6 +16,7 @@ public class OrderDto
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public User user { get; set; }
         public string Status { get; set; }
         public string ShippingAddress { get; set; }
         public DateTime CreatedAt { get; set; }

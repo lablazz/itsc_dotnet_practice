@@ -38,9 +38,9 @@ public class OrderService : IOrderService
         }
         return orders.FindAll(o => o.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
     }
-    public async Task<Order> CreateOrder(OrderDto.OrderRequest request)
+    public async Task<Order> CreateOrder(OrderDto.OrderRequest request, int userId)
     {
-        return await _repo.CreateOrder(request);
+        return await _repo.CreateOrder(request, userId);
     }
 
     public async Task<List<Order>> ApproveOrder(OrderApprovalDto orderRequest)
