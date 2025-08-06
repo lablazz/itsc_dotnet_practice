@@ -88,7 +88,7 @@ public class AuthService : IAuthService
             issuer: _config["JWT_ISSUER"],
             audience: _config["JWT_AUDIENCE"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(5),
+            expires: DateTime.Now.AddHours(5),
             signingCredentials: creds
         );
 

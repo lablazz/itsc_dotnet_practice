@@ -49,8 +49,8 @@ public static class ProductSeeder
                     Stock = random.Next(1, 50),
                     Category = "Pokémon",
                     ImageUrl = imageUrl,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 });
             }
             catch (Exception ex)

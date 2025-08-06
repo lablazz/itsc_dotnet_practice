@@ -86,8 +86,8 @@ public class OrderRepository : IOrderRepository
             UserId = userId,
             ShippingAddress = request.ShippingAddress,
             Status = "pending",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
             OrderDetails = new List<OrderDetail>()
         };
 
@@ -115,8 +115,8 @@ public class OrderRepository : IOrderRepository
                 ProductImageUrl = product.ImageUrl,
                 ProductDescription = product.Description,
                 ProductCategory = product.Category,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
                 OrderId = newOrder.Id,
                 UserId = userId
             };
@@ -142,7 +142,7 @@ public class OrderRepository : IOrderRepository
             throw new KeyNotFoundException($"Order with ID {orderId} not found.");
         }
         order.Status = newStatus;
-        order.UpdatedAt = DateTime.UtcNow;
+        order.UpdatedAt = DateTime.Now;
         _context.Orders.Update(order);
         _context.SaveChanges();
         return order;
